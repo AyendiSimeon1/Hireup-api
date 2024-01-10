@@ -35,6 +35,7 @@ shema_view = get_schema_view (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('swagger/', shema_view.with_ui('swagger', cache_timeout=0), name='shema-swagger-ui'),
+    path('accounts/', include('allauth.urls')),
+    path('', shema_view.with_ui('swagger', cache_timeout=0), name='shema-swagger-ui'),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', shema_view.without_ui(cache_timeout=0), name='schema-json'),
 ]
