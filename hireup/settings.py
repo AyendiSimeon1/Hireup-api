@@ -37,7 +37,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Custom Apss
+    'core',
+    'allauth',
+    'drf_yasg',
+    'rest_framework',
+    
+
 ]
+
+
+# Configurations For Rest Framework
+REST_FRAMEWORK = {
+
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
