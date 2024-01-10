@@ -8,6 +8,12 @@ from .serializers import RegisterSerializer
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
+    def get(self, request, format=None):
+        # Example of a simple GET method
+        # Typically, GET is used to retrieve data. Adjust this according to your requirements.
+        data = {'message': 'GET request is not typically used for registration.'}
+        return Response(data, status=status.HTTP_200_OK)
+
     def post(self, request, format=None):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
