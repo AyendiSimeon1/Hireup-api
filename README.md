@@ -19,9 +19,9 @@ Welcome to **HireUp** – where your dream job is just a resume away! 👔✨
    git clone https://github.com/your-username/HireUp.git
 
 2. **Navigate to HireUp Directory:**
-```bash
-cd HireUp
-Launch the App:
+   ```bash
+   cd HireUp
+
 
 
 ```bash
