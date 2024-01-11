@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from .serializers import RegisterSerializer, ProfileSerializer
-
+from rest_framework.permissions import IsAuthenticated
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -37,7 +37,13 @@ class LoginView(APIView):
 
 
 class Profile(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
     serializer_class = ProfileSerializer
+    #permission_classes = [IsAuthenticated]
 
     def get_object(self):
+        # Retrieve the profile of the currently logged-in user
         return self.request.user
+
+
+   
