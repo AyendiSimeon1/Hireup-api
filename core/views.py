@@ -7,6 +7,16 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from .serializers import RegisterSerializer, ProfileSerializer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets
+from .models import PersonalInformation, Education, WorkExperience, Skill, Project
+from .serializers import (
+    PersonalInformationSerializer,
+    EducationSerializer,
+    WorkExperienceSerializer,
+    SkillSerializer,
+    ProjectSerializer,
+)
+
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -46,4 +56,39 @@ class Profile(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-   
+class PersonalInformationViewSet(viewsets.ModelViewSet):
+    queryset = PersonalInformation.objects.all()
+    serializer_class = PersonalInformationSerializer
+
+class EducationViewSet(viewsets.ModelViewSet):
+    queryset = Education.objects.all()
+    serializer_class = EducationSerializer
+
+class WorkExperienceViewSet(viewsets.ModelViewSet):
+    queryset = WorkExperience.objects.all()
+    serializer_class = WorkExperienceSerializer
+
+class SkillViewSet(viewsets.ModelViewSet):
+    queryset = Skill.objects.all()
+    serializer_class = SkillSerializer
+
+class ProjectViewSet(viewsets.ModelViewSet):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+
+from rest_framework.authtoken.models import Token
+
+# def login_view(request):
+#     # ... your login logic
+#     token, created = Token.objects.get_or_create(user=user)
+#     return Response({'token': token.key})
+
+# from rest_framework.authentication import TokenAuthentication
+# from rest_framework.permissions import IsAuthenticated
+
+# class ResumeCreateView(APIView):
+#     authentication_classes = [TokenAuthentication]
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request):
+        # ... handle resume creation
