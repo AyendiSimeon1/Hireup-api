@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
+from .models import PersonalInformation, Education, WorkExperience, Skill, Project
 
 
 User = get_user_model()
@@ -39,3 +40,28 @@ class RegisterSerializer(serializers.Serializer):
         user.save()
         setup_user_email(request, user, [])
         return user
+
+class PersonalInformationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PersonalInformation
+        fields = '__all__'
+
+class EducationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Education
+        fields = '__all__'
+
+class WorkExperienceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkExperience
+        fields = '__all__'
+
+class SkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Skill
+        fields = '__all__'
+
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = '__all__'
