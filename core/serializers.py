@@ -6,7 +6,7 @@ from allauth.account.utils import setup_user_email
 
 User = get_user_model()
 
-class ProfileSerializer(serializer.Serializer):
+class ProfileSerializer(serializers.Serializer):
     model = User
     fields = ('id', 'email', 'username')
 
