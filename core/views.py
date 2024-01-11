@@ -5,7 +5,7 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer, ProfileSerializer
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -36,7 +36,7 @@ class LoginView(APIView):
         return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-class Profile(generics.RetriveUpdateAPIView):
+class Profile(generics.RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
 
     def get_object(self):
