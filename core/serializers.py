@@ -8,7 +8,7 @@ User = get_user_model()
 
 class ProfileSerializer(serializers.Serializer):
     model = User
-    fields = ('id', 'email', 'username')
+    fields = ['id', 'email', 'username']
 
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
