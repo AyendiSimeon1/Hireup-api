@@ -7,8 +7,11 @@ from allauth.account.utils import setup_user_email
 User = get_user_model()
 
 class ProfileSerializer(serializers.Serializer):
-    model = User
-    fields = ['id', 'email', 'username']
+    class Meta:
+
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
+
 
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
