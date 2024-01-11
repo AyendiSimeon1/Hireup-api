@@ -32,3 +32,9 @@ class LoginView(APIView):
             login(request, user)
             return Response({'message': 'User logged in successfully'}, status=status.HTTP_200_OK)
         return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class Profile(APIView):
+
+    def get(self, request):
+        
