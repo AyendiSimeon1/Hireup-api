@@ -15,6 +15,7 @@ from .serializers import (
     WorkExperienceSerializer,
     SkillSerializer,
     ProjectSerializer,
+    ResumeTemplateSerializer,
 )
 
 class RegisterView(APIView):
