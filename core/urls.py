@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import RegisterView, LoginView, Profile
+from .views import RegisterView, LoginView, Profile, ResumeTemplateList
 from rest_framework.routers import DefaultRouter
 from .views import (
     PersonalInformationViewSet,
@@ -21,6 +21,7 @@ urlpatterns= [
     path('register/', RegisterView.as_view(), name='register'),
     path('login/', LoginView.as_view(), name='login'),
     path('profile/', Profile.as_view(), name='profile'),
+    path('resume-templates/', ResumeTemplateList.as_view(), name='resume-template-list'),
     path('', include(router.urls)),
 
 ]
