@@ -17,7 +17,7 @@ class Education(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     degree = models.CharField(max_length=255)
     institution = models.CharField(max_length=255)
-    start_date = models.DateField()
+    start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     description = models.TextField(blank=True, null=True)
 
@@ -28,7 +28,7 @@ class WorkExperience(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     job_title = models.CharField(max_length=255)
     company = models.CharField(max_length=255)
-    start_date = models.DateField()
+    start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     responsibilities = models.TextField(blank=True, null=True)
 
@@ -46,9 +46,13 @@ class Project(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     project_name = models.CharField(max_length=255)
     description = models.TextField()
-    start_date = models.DateField()
+    start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     url = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return self.project_name
+
+class ResumeTemplate(models.Model):
+    name = models.CharField(max_length=255)
+    design = models.TextField() 
