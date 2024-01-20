@@ -21,8 +21,7 @@ class RegisterView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, format=None):
-        # Example of a simple GET method
-        # Typically, GET is used to retrieve data. Adjust this according to your requirements.
+        
         data = {'message': 'GET request is not typically used for registration.'}
         return Response(data, status=status.HTTP_200_OK)
 
@@ -92,3 +91,7 @@ from rest_framework.authtoken.models import Token
 
 #     def post(self, request):
         # ... handle resume creation
+
+class ResumeTemplateList(generics.ListAPIView):
+    queryset = ResumeTemplate.objects.all()
+    serializer_class = ResumeTemplateSerializer
