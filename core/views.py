@@ -1,3 +1,7 @@
+from django.http import HttpResponse
+from django.templates.loader import render_to_string
+from weasyprint import HTML
+import tempfile
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
