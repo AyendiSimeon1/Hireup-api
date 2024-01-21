@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-# from django.templates.loader import render_to_string
+from django.shortcuts import get_object_or_404
 
 import tempfile
 from rest_framework.views import APIView
@@ -13,10 +13,11 @@ from django.contrib.auth.models import User
 from .serializers import RegisterSerializer, ProfileSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
+from rest_framework.decorators import api_view
 #from weasyprint import HTML
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from .models import PersonalInformation, Education, WorkExperience, Skill, Project
+from .models import PersonalInformation, Education, WorkExperience, Skill, Project, ResumeTemplate
 from .serializers import (
     PersonalInformationSerializer,
     EducationSerializer,
@@ -101,28 +102,33 @@ from rest_framework.authtoken.models import Token
 #     def post(self, request):
         # ... handle resume creation
 
-def ResumeTemplateList(request, template_id, user_id):
-    # Fetch the template and user data from the database
-    template = get_object_or_404(ResumeTemplate, pk=template_id)
-    user_profile = get_object_or_404(User, pk=user_id)
 
-    # Create a PDF file
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
+class ResumeTemplateList(APIView):
 
-    # Create PDF using ReportLab
-    document = canvas.Canvas(response, pagesize=letter)
+    def get(self, request, format=None):
+        template_id = 1
+        user_id = 1
+        template = get_object_or_404(ResumeTemplate, pk=template_id)
+        user_profile = get_object_or_404(User, pk=user_id)
 
-    # Set the font and draw dynamic text from the database
-    document.setFont("Helvetica", 12)
-    document.drawString(100, 750, f"Resume Template: {template.name}")
-    document.drawString(100, 730, f"Name: {user_profile.name}")
-    document.drawString(100, 710, f"Date: {user_profile.date}")
+        # Create a PDF file
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
 
-    # Add more dynamic content or flowables as needed
+        # Create PDF using ReportLab
+        document = canvas.Canvas(response, pagesize=letter)
 
-    # Save the PDF
-    document.save()
+        # Set the font and draw dynamic text from the database
+        document.setFont("Helvetica", 12)
+        document.drawString(100, 750, f"Resume Template: {template.name}")
+        document.drawString(100, 730, f"Name: {user_profile.email}")
+        document.drawString(100, 710, f"Date: {user_profile.username}")
 
-    return response
+        # Add more dynamic content or flowables as needed
+
+        # Save the PDF
+        document.save()
+
+        
+        return Response({"message": "PDF generated"})
     

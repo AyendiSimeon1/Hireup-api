@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import PersonalInformation, Education, WorkExperience, Skill, Project
+from .models import PersonalInformation, Education, WorkExperience, Skill, Project, ResumeTemplate
 
 
 class PersonalInformationAdmin(admin.ModelAdmin):
@@ -34,3 +34,4 @@ class ProjectAdmin(admin.ModelAdmin):
 
 admin.site.register(Project, ProjectAdmin)
 
+admin.site.register(ResumeTemplate)
