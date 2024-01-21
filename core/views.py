@@ -13,7 +13,9 @@ from django.contrib.auth.models import User
 from .serializers import RegisterSerializer, ProfileSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
-from weasyprint import HTML
+#from weasyprint import HTML
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 from .models import PersonalInformation, Education, WorkExperience, Skill, Project
 from .serializers import (
     PersonalInformationSerializer,
@@ -99,25 +101,28 @@ from rest_framework.authtoken.models import Token
 #     def post(self, request):
         # ... handle resume creation
 
-class GenerateResumeView(APIView):
-    parser_classes = [JSONParser]
+def ResumeTemplateList(request, template_id, user_id):
+    # Fetch the template and user data from the database
+    template = get_object_or_404(ResumeTemplate, pk=template_id)
+    user_profile = get_object_or_404(UserProfile, pk=user_id)
 
-    def post(self, request, format=None):
-        # Extract template ID and user profile data from request
-        template_id = request.data.get('template_id')
-        user_profile_data = request.data.get('user_profile')
+    # Create a PDF file
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
 
-        # Retrieve the template
-        template = ResumeTemplate.objects.get(pk=template_id)
-        html_content = render_resume_html(template.html_content, user_profile_data)
-        html = HTML(string=html_content)
-        result = html.write_pdf()
+    # Create PDF using ReportLab
+    document = canvas.Canvas(response, pagesize=letter)
 
-        response = HttpResponse(result, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
-        return response
-def render_resume_html(template_html, user_profile_data):
-    # Process the template_html with user_profile_data to generate final HTML
-    # You can use string formatting, a templating engine, etc.
-    return processed_html
+    # Set the font and draw dynamic text from the database
+    document.setFont("Helvetica", 12)
+    document.drawString(100, 750, f"Resume Template: {template.name}")
+    document.drawString(100, 730, f"Name: {user_profile.name}")
+    document.drawString(100, 710, f"Date: {user_profile.date}")
+
+    # Add more dynamic content or flowables as needed
+
+    # Save the PDF
+    document.save()
+
+    return response
     
