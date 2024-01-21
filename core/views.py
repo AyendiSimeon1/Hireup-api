@@ -104,7 +104,7 @@ from rest_framework.authtoken.models import Token
 def ResumeTemplateList(request, template_id, user_id):
     # Fetch the template and user data from the database
     template = get_object_or_404(ResumeTemplate, pk=template_id)
-    user_profile = get_object_or_404(UserProfile, pk=user_id)
+    user_profile = get_object_or_404(User, pk=user_id)
 
     # Create a PDF file
     response = HttpResponse(content_type='application/pdf')
