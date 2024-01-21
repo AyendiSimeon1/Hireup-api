@@ -1,17 +1,19 @@
 from django.http import HttpResponse
-from django.templates.loader import render_to_string
-from weasyprint import HTML
+# from django.templates.loader import render_to_string
+
 import tempfile
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
+from rest_framework.parsers import JSONParser
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from .serializers import RegisterSerializer, ProfileSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
+from weasyprint import HTML
 from .models import PersonalInformation, Education, WorkExperience, Skill, Project
 from .serializers import (
     PersonalInformationSerializer,
@@ -97,6 +99,25 @@ from rest_framework.authtoken.models import Token
 #     def post(self, request):
         # ... handle resume creation
 
-class ResumeTemplateList(generics.ListAPIView):
-    queryset = ResumeTemplate.objects.all()
-    serializer_class = ResumeTemplateSerializer
+class GenerateResumeView(APIView):
+    parser_classes = [JSONParser]
+
+    def post(self, request, format=None):
+        # Extract template ID and user profile data from request
+        template_id = request.data.get('template_id')
+        user_profile_data = request.data.get('user_profile')
+
+        # Retrieve the template
+        template = ResumeTemplate.objects.get(pk=template_id)
+        html_content = render_resume_html(template.html_content, user_profile_data)
+        html = HTML(string=html_content)
+        result = html.write_pdf()
+
+        response = HttpResponse(result, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
+        return response
+def render_resume_html(template_html, user_profile_data):
+    # Process the template_html with user_profile_data to generate final HTML
+    # You can use string formatting, a templating engine, etc.
+    return processed_html
+    
