@@ -14,7 +14,8 @@ from .serializers import RegisterSerializer, ProfileSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
-#from weasyprint import HTML
+# from django.template.loader import render_to_string
+# from weasyprint import HTML
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from .models import PersonalInformation, Education, WorkExperience, Skill, Project, ResumeTemplate
@@ -105,30 +106,30 @@ from rest_framework.authtoken.models import Token
 
 class ResumeTemplateList(APIView):
 
-    def get(self, request, format=None):
-        template_id = 1
-        user_id = 1
-        template = get_object_or_404(ResumeTemplate, pk=template_id)
-        user_profile = get_object_or_404(User, pk=user_id)
+    def get(self, request, user_id, template_id):
+        user = User.objects.get(pk=user_id)
+        experiences = WorkExperience.objects.filter(user=user)
+        skills = Skill.objects.filter(user=user)
+        projects = Project.objects.filter(user=user)
 
-        # Create a PDF file
-        response = HttpResponse(content_type='application/pdf')
+        data = request.data
+        template_id = data['templateId']
+        # resume_data = data['resumeData']
+        # Fetch the HTML template from the database
+        try:
+            html_template = HtmlTemplate.objects.get(pk=template_id)
+        except HtmlTemplate.DoesNotExist:
+            return HttpResponse("Template not found", status=404)
+
+        # Render the HTML content with context
+        html_content = html_template.content.format(user=user, experiences=experiences, skills=skills, projects=projects)
+
+        # Generate PDF
+        pdf = pdfkit.from_string(html_content, False)
+
+        # Create a Django response
+        response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
-
-        # Create PDF using ReportLab
-        document = canvas.Canvas(response, pagesize=letter)
-
-        # Set the font and draw dynamic text from the database
-        document.setFont("Helvetica", 12)
-        document.drawString(100, 750, f"Resume Template: {template.name}")
-        document.drawString(100, 730, f"Name: {user_profile.email}")
-        document.drawString(100, 710, f"Date: {user_profile.username}")
-
-        # Add more dynamic content or flowables as needed
-
-        # Save the PDF
-        document.save()
-
-        
-        return Response({"message": "PDF generated"})
+        return response
+            
     
