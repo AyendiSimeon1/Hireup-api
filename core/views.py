@@ -15,7 +15,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 # from django.template.loader import render_to_string
-# from weasyprint import HTML
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from .models import PersonalInformation, Education, WorkExperience, Skill, Project, ResumeTemplate
@@ -108,28 +107,34 @@ class ResumeTemplateList(APIView):
     def get(self, request):
         user_id = 1
         user = User.objects.get(pk=user_id)
-        experiences = WorkExperience.objects.filter(user=user)
+        experiences = WorkExperience.objects.all()
         skills = Skill.objects.filter(user=user)
         projects = Project.objects.filter(user=user)
 
         # data = request.data
         # template_id = data['templateId']
-        template_id = 1
+        template_id = 2
         # resume_data = data['resumeData']
         # Fetch the HTML template from the database
+        skills_string = ', '.join([skill.skill_name for skill in skills])
+
         try:
             html_template = ResumeTemplate.objects.get(pk=template_id)
         except HtmlTemplate.DoesNotExist:
             return HttpResponse("Template not found", status=404)
 
-        html_content = html_template.design.format(user=user, experiences=experiences, skills=skills, projects=projects)
+        html_content = html_template.design.format(user=user, experiences=experiences, skills=skills_string, projects=projects)
 
-        # Generate PDF
-        pdf = pdfkit.from_string(html_content, False)
+        
+        path_wkhtmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'  # Replace with your path
+        config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+
+        pdf = pdfkit.from_string(html_content, configuration=config)
 
         # Create a Django response
-        response = HttpResponse(pdf, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
-        return response
+        return HttpResponse(html_content, content_type='text/html')
+        # response = HttpResponse(pdf, content_type='application/pdf')
+        # response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
+       
             
     
