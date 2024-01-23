@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-
+import pdfkit
 import tempfile
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -105,24 +105,24 @@ from rest_framework.authtoken.models import Token
 
 
 class ResumeTemplateList(APIView):
-
-    def get(self, request, user_id, template_id):
+    def get(self, request):
+        user_id = 1
         user = User.objects.get(pk=user_id)
         experiences = WorkExperience.objects.filter(user=user)
         skills = Skill.objects.filter(user=user)
         projects = Project.objects.filter(user=user)
 
-        data = request.data
-        template_id = data['templateId']
+        # data = request.data
+        # template_id = data['templateId']
+        template_id = 1
         # resume_data = data['resumeData']
         # Fetch the HTML template from the database
         try:
-            html_template = HtmlTemplate.objects.get(pk=template_id)
+            html_template = ResumeTemplate.objects.get(pk=template_id)
         except HtmlTemplate.DoesNotExist:
             return HttpResponse("Template not found", status=404)
 
-        # Render the HTML content with context
-        html_content = html_template.content.format(user=user, experiences=experiences, skills=skills, projects=projects)
+        html_content = html_template.design.format(user=user, experiences=experiences, skills=skills, projects=projects)
 
         # Generate PDF
         pdf = pdfkit.from_string(html_content, False)
