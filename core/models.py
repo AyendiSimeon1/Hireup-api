@@ -40,7 +40,7 @@ class Skill(models.Model):
     skill_name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.skill_name
+        return f"Username: {self.skill_name}, Email: {self.user}"
 
 class Project(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -56,3 +56,6 @@ class Project(models.Model):
 class ResumeTemplate(models.Model):
     name = models.CharField(max_length=255)
     design = models.TextField() 
+
+    def __str__(self):
+        return self.name
