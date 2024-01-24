@@ -122,16 +122,32 @@ class ResumeTemplateList(APIView):
         skills_string = ', '.join([str(skill) for skill in skills])
         personal_string = ', '.join([str(personal) for personal in information])
 
+       
+
+        # Replace the placeholder in the template
         
         try:
             html_template = ResumeTemplate.objects.get(pk=template_id)
         except HtmlTemplate.DoesNotExist:
             return HttpResponse("Template not found", status=404)
+        
+      
+        job_titles = ', '.join([experience.job_title for experience in experiences])
+        responsibilities = ', '.join([experience.responsibilities for experience in experiences])
 
-        html_content = html_template.design.format(user=user, information=personal_string, experiences=experiences, skills=skills_string, projects=projects)
+        #html_content = html_template.design.replace('{experiences}', experiences_html)
+        html_content = html_template.design.format(
+            user=user,
+            information=personal_string,
+            experiences=experiences, 
+            skills=skills_string, 
+            projects=projects, 
+            job_titles=job_titles, 
+            responsibilities=responsibilities
+            )
 
         
-        path_wkhtmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'  # Replace with your path
+        path_wkhtmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'  
         config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
 
         pdf = pdfkit.from_string(html_content, configuration=config)

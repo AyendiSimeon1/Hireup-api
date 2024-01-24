@@ -33,7 +33,7 @@ class WorkExperience(models.Model):
     responsibilities = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.job_title} at {self.company}"
+        return f"{self.job_title} at {self.company} in {self.user}"
 
 class Skill(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
