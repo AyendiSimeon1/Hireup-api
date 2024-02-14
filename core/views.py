@@ -46,15 +46,18 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, format=None):
+        serializer = ProfileSerializer()
         email = request.data.get('email')
         password = request.data.get('password')
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            user_serializer = ProfileSerializer
-            return Response({'message': user_serializer}, status=status.HTTP_200_OK)
+            serializer = ProfileSerializer(user)
+            return Response({
+                'message': 'User logged in successfully',
+                'user': serializer.data
+            }, status=status.HTTP_200_OK)
         return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
 
 class Profile(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()

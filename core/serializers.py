@@ -7,9 +7,8 @@ from .models import PersonalInformation, Education, WorkExperience, Skill, Proje
 
 User = get_user_model()
 
-class ProfileSerializer(serializers.Serializer):
+class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
-
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name']
 
