@@ -3,37 +3,41 @@ from django.contrib.auth.models import User
 
 class PersonalInformation(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    full_name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=20, blank=True, null=True)
+    last_name = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField()
+    job_title = models.CharField(max_length=20, blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
-    linkedin_profile = models.URLField(blank=True, null=True)
-    github_profile = models.URLField(blank=True, null=True)
+    city = models.CharField(max_length=30, blank=True)
+    state = models.CharField(max_length=30, blank=True)
+    country = models.CharField(max_length=30, blank=True)
 
     def __str__(self):
-        return self.full_name 
+        return self.first_name
+
+class ProfessionalExperience(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    positiion_title = models.CharField(max_length=255)
+    company_name = models.CharField(max_length=255)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    work_summary = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.job_title} at {self.company} in {self.user}"
 
 class Education(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    institution_name = models.CharField(max_length=255)
     degree = models.CharField(max_length=255)
-    institution = models.CharField(max_length=255)
+    field_study = models.CharField(max_length=20)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.degree} at {self.institution}"
-
-class WorkExperience(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    job_title = models.CharField(max_length=255)
-    company = models.CharField(max_length=255)
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
-    responsibilities = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.job_title} at {self.company} in {self.user}"
 
 class Skill(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -52,6 +56,15 @@ class Project(models.Model):
 
     def __str__(self):
         return self.project_name
+
+class Socials(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    twitter = models.CharField(max_length=20, blank=True)
+    github = models.CharField(max_length=20, blank=True)
+    linkedin = models.CharField(max_length=20, blank=True)
+
+class ProfessionalSummary(models.Model):
+    user = models.ForeignKey(User, on_delete=models)
 
 class ResumeTemplate(models.Model):
     name = models.CharField(max_length=255)
