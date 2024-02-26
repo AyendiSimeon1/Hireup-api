@@ -1,26 +1,25 @@
 from django.contrib import admin
-from .models import PersonalInformation, Education, WorkExperience, Skill, Project, ResumeTemplate
+from .models import PersonalInformation, Education, ProfessionalExperience, Skill, Project, ResumeTemplate
 
 
 class PersonalInformationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'full_name', 'email', 'phone_number')
-    search_fields = ('full_name', 'email')
+    list_display = ('user', 'first_name')
+   
 
 admin.site.register(PersonalInformation, PersonalInformationAdmin)
 
 class EducationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'degree', 'institution', 'start_date', 'end_date')
-    list_filter = ('institution', 'degree')
-    search_fields = ('degree', 'institution', 'user__username')
+    list_display = ('user', 'degree', 'start_date', 'end_date')
+ 
+    search_fields = ('degree', 'user__username')
 
 admin.site.register(Education, EducationAdmin)
 
-class WorkExperienceAdmin(admin.ModelAdmin):
-    list_display = ('user', 'job_title', 'company', 'start_date', 'end_date')
-    list_filter = ('company', 'job_title')
-    search_fields = ('job_title', 'company', 'user__username')
+class ProfessionalExperienceAdmin(admin.ModelAdmin):
+    list_display = ('user', 'start_date')
+    
 
-admin.site.register(WorkExperience, WorkExperienceAdmin)
+admin.site.register(ProfessionalExperience, ProfessionalExperienceAdmin)
 
 class SkillAdmin(admin.ModelAdmin):
     list_display = ('user', 'skill_name')

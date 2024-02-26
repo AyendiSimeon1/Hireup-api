@@ -17,11 +17,11 @@ from rest_framework.decorators import api_view
 # from django.template.loader import render_to_string
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from .models import PersonalInformation, Education, WorkExperience, Skill, Project, ResumeTemplate
+from .models import PersonalInformation, Education, ProfessionalExperience, Skill, Project, ResumeTemplate
 from .serializers import (
     PersonalInformationSerializer,
     EducationSerializer,
-    WorkExperienceSerializer,
+    ProfessionalExperienceSerializer,
     SkillSerializer,
     ProjectSerializer,
     ResumeTemplateSerializer,
@@ -77,9 +77,9 @@ class EducationViewSet(viewsets.ModelViewSet):
     queryset = Education.objects.all()
     serializer_class = EducationSerializer
 
-class WorkExperienceViewSet(viewsets.ModelViewSet):
-    queryset = WorkExperience.objects.all()
-    serializer_class = WorkExperienceSerializer
+class ProfessionalExperienceViewSet(viewsets.ModelViewSet):
+    queryset = ProfessionalExperience.objects.all()
+    serializer_class = ProfessionalExperienceSerializer
 
 class SkillViewSet(viewsets.ModelViewSet):
     queryset = Skill.objects.all()

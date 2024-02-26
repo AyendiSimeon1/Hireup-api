@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class PersonalInformation(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=20, blank=True, null=True)
@@ -16,19 +17,28 @@ class PersonalInformation(models.Model):
     def __str__(self):
         return self.first_name
 
+
+class Skill(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
 class ProfessionalExperience(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    positiion_title = models.CharField(max_length=255)
+    position_title = models.CharField(max_length=255)
     company_name = models.CharField(max_length=255)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     work_summary = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.job_title} at {self.company} in {self.user}"
+        return f"{self.position_title} at {self.company}"
+
+
+
+
 
 class Education(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     institution_name = models.CharField(max_length=255)
     degree = models.CharField(max_length=255)
     field_study = models.CharField(max_length=20)
@@ -37,17 +47,10 @@ class Education(models.Model):
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.degree} at {self.institution}"
+        return f"{self.degree} at {self.institution_name}"
 
-class Skill(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    skill_name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"Username: {self.skill_name}, Email: {self.user}"
 
 class Project(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     project_name = models.CharField(max_length=255)
     description = models.TextField()
     start_date = models.DateField(null=True, blank=True)
@@ -57,18 +60,35 @@ class Project(models.Model):
     def __str__(self):
         return self.project_name
 
+
 class Socials(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     twitter = models.CharField(max_length=20, blank=True)
     github = models.CharField(max_length=20, blank=True)
     linkedin = models.CharField(max_length=20, blank=True)
 
+    def __str__(self):
+        return f"Twitter: {self.twitter}, Github: {self.github}, Linkedin: {self.linkedin}"
+
+
 class ProfessionalSummary(models.Model):
-    user = models.ForeignKey(User, on_delete=models)
+    content = models.TextField()
+
+    def __str__(self):
+        return self.content[:20] + "..."  # Truncate to first 20 characters with ellipsis
 
 class ResumeTemplate(models.Model):
-    name = models.CharField(max_length=255)
-    design = models.TextField() 
+    name = models.CharField(max_length=255)  # Template name
+    content = models.TextField()  # Template content (HTML or other format)
 
     def __str__(self):
         return self.name
+
+class User(User): 
+    personal_info = models.OneToOneField(PersonalInformation, on_delete=models.CASCADE)
+    skills = models.ManyToManyField(Skill, blank=True)
+    professional_experiences = models.ForeignKey(ProfessionalExperience, on_delete=models.CASCADE, related_name="user_experiences")
+    educations = models.ForeignKey(Education, on_delete=models.CASCADE, related_name="user_educations")
+    projects = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="user_projects")
+    socials = models.ForeignKey(Socials, on_delete=models.CASCADE, related_name="user_socials")
+    professional_summary = models.ForeignKey(ProfessionalSummary, on_delete=models.CASCADE, related_name="user_summary")
+    selected_template = models.ForeignKey(ResumeTemplate, on_delete=models.SET_NULL, null=True, blank=True)

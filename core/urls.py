@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     PersonalInformationViewSet,
     EducationViewSet,
-    WorkExperienceViewSet,
+    ProfessionalExperienceViewSet,
     SkillViewSet,
     ProjectViewSet,
 )
@@ -12,7 +12,7 @@ from .views import (
 router = DefaultRouter()
 router.register(r'personal-information', PersonalInformationViewSet)
 router.register(r'education', EducationViewSet)
-router.register(r'work-experience', WorkExperienceViewSet)
+router.register(r'Professional-experience', ProfessionalExperienceViewSet)
 router.register(r'skill', SkillViewSet)
 router.register(r'project', ProjectViewSet)
 
