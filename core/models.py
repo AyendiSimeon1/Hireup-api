@@ -18,13 +18,13 @@ class PersonalInformation(models.Model):
 
 
 class Skill(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 class ProfessionalExperience(models.Model):
-    position_title = models.CharField(max_length=255)
+    position_title = models.CharField(max_length=255, null=True, blank=True)
     company_name = models.CharField(max_length=255)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
@@ -85,9 +85,12 @@ class ResumeTemplate(models.Model):
 class User(User): 
     personal_info = models.OneToOneField(PersonalInformation, on_delete=models.CASCADE)
     skills = models.ManyToManyField(Skill, blank=True)
-    professional_experiences = models.ForeignKey(ProfessionalExperience, on_delete=models.CASCADE, related_name="user_experiences")
-    educations = models.ForeignKey(Education, on_delete=models.CASCADE, related_name="user_educations")
-    projects = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="user_projects")
-    socials = models.ForeignKey(Socials, on_delete=models.CASCADE, related_name="user_socials")
+    professional_experiences = models.ManyToManyField(ProfessionalExperience, blank=True)
+    educations = models.ManyToManyField(Education,  related_name="user_educations")
+    projects = models.ManyToManyField(Project, related_name="user_projects")
+    socials = models.ForeignKey(Socials, on_delete=models.CASCADE,related_name="user_socials")
     professional_summary = models.ForeignKey(ProfessionalSummary, on_delete=models.CASCADE, related_name="user_summary")
     selected_template = models.ForeignKey(ResumeTemplate, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.personal_info

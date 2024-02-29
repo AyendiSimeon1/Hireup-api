@@ -24,5 +24,5 @@ Welcome to **HireUp** – where your dream job is just a resume away! 👔✨
 
 
 
-```bash
-python manage.py runserver
+   ```bash
+   python manage.py runserver

@@ -140,7 +140,7 @@ class ResumeTemplateList(APIView):
         responsibilities = ', '.join([experience.responsibilities for experience in experiences])
 
         #html_content = html_template.design.replace('{experiences}', experiences_html)
-        html_content = html_template.design.format(
+        html_content = html_template.content.format(
             user=user,
             information=personal_string,
             experiences=experiences, 
@@ -156,7 +156,7 @@ class ResumeTemplateList(APIView):
 
         pdf = pdfkit.from_string(html_content, configuration=config)
 
-        # Create a Django response
+   
         return HttpResponse(html_content, content_type='text/html')
       
             
