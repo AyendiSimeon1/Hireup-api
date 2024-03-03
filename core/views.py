@@ -163,3 +163,15 @@ class ResumeTemplateList(APIView):
         # response = HttpResponse(pdf, content_type='application/pdf')
         # response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
         # return response
+
+
+class CreateResumeAPIView(APIView):
+    def post(self, request):
+        template_id = request.data.get('template_id')
+        try:
+            template = ResumeTemplate.objects.get(id=template_id)
+        except ResumeTemplate.DoesNotExist:
+            return Response({'error': 'Template not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        resume_data = create_resume_from_template(template)
+        return Response(resume_data)
