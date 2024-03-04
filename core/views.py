@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+okfrom django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 import pdfkit
 import tempfile
@@ -175,3 +175,64 @@ class CreateResumeAPIView(APIView):
         
         resume_data = create_resume_from_template(template)
         return Response(resume_data)
+
+
+
+Certainly! Here's how you can implement the API endpoint in Django to handle the selection of templates by a user and generate a PDF resume:
+
+```python
+# views.py
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Template, PersonalInformation, Experience
+from .serializers import PersonalInformationSerializer, ExperienceSerializer
+from .pdf_generation import generate_pdf
+
+class GeneratePDFAPIView(APIView):
+    def post(self, request):
+        try:
+            # Extract data from the request
+            user_id = request.data.get('user_id')
+            template_id = request.data.get('template_id')
+            
+            # Fetch user information based on the user ID
+            user_info = PersonalInformation.objects.get(user_id=user_id)
+            experience = Experience.objects.filter(user_id=user_id)
+            
+            # Fetch the selected template
+            template = Template.objects.get(id=template_id)
+            
+            # Serialize user information and experience
+            user_info_serializer = PersonalInformationSerializer(user_info)
+            experience_serializer = ExperienceSerializer(experience, many=True)
+            
+            # Combine user information, experience, and template content
+            context = {
+                'user_info': user_info_serializer.data,
+                'experience': experience_serializer.data,
+                'template_content': template.html_content
+            }
+            
+            # Generate PDF
+            pdf_file = generate_pdf(context)
+            
+            # Return the PDF file
+            return Response({'pdf_file': pdf_file}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+```
+
+In this code:
+
+- We define a new APIView called `GeneratePDFAPIView`.
+- In the `post` method, we extract the `user_id` and `template_id` from the request data.
+- We fetch the user information and experience based on the `user_id`.
+- We fetch the selected template based on the `template_id`.
+- We serialize the user information and experience.
+- We combine the user information, experience, and template content into a context dictionary.
+- We call the `generate_pdf` function with the context to generate the PDF file.
+- Finally, we return the PDF file in the response.
+
+You'll need to implement the `generate_pdf` function separately to generate the PDF file from the provided context.
+
