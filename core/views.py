@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 import pdfkit
 import tempfile
@@ -65,7 +65,7 @@ class Profile(generics.RetrieveUpdateAPIView):
     #permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        # Retrieve the profile of the currently logged-in user
+        
         return self.request.user
 
 
@@ -107,59 +107,68 @@ from rest_framework.authtoken.models import Token
         # ... handle resume creation
 
 
-class ResumeTemplateList(APIView):
-    #permission_classes = [IsAuthenticated]
-    def get(self, request):
-        user_id = 1
-        user = request.user
-        user = User.objects.get(pk=user_id)
-        information = PersonalInformation.objects.all()
-        experiences = WorkExperience.objects.all()
-        skills = Skill.objects.filter(user=user)
-        projects = Project.objects.filter(user=user)
+# class ResumeTemplateList(APIView):
+#     #permission_classes = [IsAuthenticated]
+#     def get(self, request):
+#         user_id = 1
+#         user = request.user
+#         user = User.objects.get(pk=user_id)
+#         information = PersonalInformation.objects.all()
+#         experiences = ProfessionalExperience.objects.all()
+#         skills = Skill.objects.filter(user=user)
+#         projects = Project.objects.filter(user=user)
 
-        # data = request.data
-        # template_id = data['templateId']
-        template_id = 2
-        # resume_data = data['resumeData']
-        # Fetch the HTML template from the database
-        skills_string = ', '.join([str(skill) for skill in skills])
-        personal_string = ', '.join([str(personal) for personal in information])
+#         # data = request.data
+#         # template_id = data['templateId']
+#         template_id = 2
+#         # resume_data = data['resumeData']
+#         # Fetch the HTML template from the database
+#         skills_string = ', '.join([str(skill) for skill in skills])
+#         personal_string = ', '.join([str(personal) for personal in information])
 
        
 
-        # Replace the placeholder in the template
+#         # Replace the placeholder in the template
         
-        try:
-            html_template = ResumeTemplate.objects.get(pk=template_id)
-        except HtmlTemplate.DoesNotExist:
-            return HttpResponse("Template not found", status=404)
+#         try:
+#             html_template = ResumeTemplate.objects.get(pk=template_id)
+#         except HtmlTemplate.DoesNotExist:
+#             return HttpResponse("Template not found", status=404)
         
       
-        job_titles = ', '.join([experience.job_title for experience in experiences])
-        responsibilities = ', '.join([experience.responsibilities for experience in experiences])
+#         job_titles = ', '.join([experience.job_title for experience in experiences])
+#         responsibilities = ', '.join([experience.responsibilities for experience in experiences])
 
-        #html_content = html_template.design.replace('{experiences}', experiences_html)
-        html_content = html_template.content.format(
-            user=user,
-            information=personal_string,
-            experiences=experiences, 
-            skills=skills_string, 
-            projects=projects, 
-            job_titles=job_titles, 
-            responsibilities=responsibilities
-            )
+#         #html_content = html_template.design.replace('{experiences}', experiences_html)
+#         html_content = html_template.content.format(
+#             user=user,
+#             information=personal_string,
+#             experiences=experiences, 
+#             skills=skills_string, 
+#             projects=projects, 
+#             job_titles=job_titles, 
+#             responsibilities=responsibilities
+#             )
 
         
-        path_wkhtmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'  
-        config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+#         path_wkhtmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'  
+#         config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
 
-        pdf = pdfkit.from_string(html_content, configuration=config)
+#         pdf = pdfkit.from_string(html_content, configuration=config)
 
    
-        return HttpResponse(html_content, content_type='text/html')
+#         return HttpResponse(html_content, content_type='text/html')
       
             
-        # response = HttpResponse(pdf, content_type='application/pdf')
-        # response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
-        # return response
+#         # response = HttpResponse(pdf, content_type='application/pdf')
+#         # response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
+#         # return response
+
+
+class get_resume_template(APIView):
+    def get(self, request):
+        templates = ResumeTemplate.objects.all()
+        serializer = ResumeTemplateSerializer(templates, many=True)
+        return Response(serializer.data)
+
+    

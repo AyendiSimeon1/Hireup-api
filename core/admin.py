@@ -1,6 +1,8 @@
-# from django.contrib import admin
+from django.contrib import admin
 # from .models import PersonalInformation, Education, ProfessionalExperience, Skill, Project, ResumeTemplate
+from .models import ResumeTemplate
 
+admin.site.register(ResumeTemplate)
 
 # class PersonalInformationAdmin(admin.ModelAdmin):
 #     list_display = ('user', 'first_name')

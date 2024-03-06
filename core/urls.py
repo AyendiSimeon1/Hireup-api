@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import RegisterView, LoginView, Profile, ResumeTemplateList
+from .views import RegisterView, LoginView, Profile
 from rest_framework.routers import DefaultRouter
 from .views import (
     PersonalInformationViewSet,
@@ -7,6 +7,7 @@ from .views import (
     ProfessionalExperienceViewSet,
     SkillViewSet,
     ProjectViewSet,
+    get_resume_template,
 )
 
 router = DefaultRouter()
@@ -18,11 +19,11 @@ router.register(r'project', ProjectViewSet)
 
 
 urlpatterns= [
-    path('resume-templates/', ResumeTemplateList.as_view(), name='resume-templates'),
+    #path('resume-templates/', ResumeTemplateList.as_view(), name='resume-templates'),
     path('register/', RegisterView.as_view(), name='register'),
     path('login/', LoginView.as_view(), name='login'),
     path('profile/', Profile.as_view(), name='profile'),
-    
+    path('choose-resume-template/', get_resume_template.as_view(), name='get_resume_template'),
     path('', include(router.urls)),
 
 ]
