@@ -83,6 +83,13 @@ class ResumeTemplate(models.Model):
     def __str__(self):
         return self.name
 
+class TemplateSelection(models.Model):
+    template_name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.template_name
+
+
 class User(User): 
     personal_info = models.OneToOneField(PersonalInformation, on_delete=models.CASCADE)
     skills = models.ManyToManyField(Skill, blank=True)
@@ -91,7 +98,9 @@ class User(User):
     projects = models.ManyToManyField(Project, related_name="user_projects")
     socials = models.ForeignKey(Socials, on_delete=models.CASCADE,related_name="user_socials")
     professional_summary = models.ForeignKey(ProfessionalSummary, on_delete=models.CASCADE, related_name="user_summary")
-    selected_template = models.ForeignKey(ResumeTemplate, on_delete=models.SET_NULL, null=True, blank=True)
+    selected_template = models.ForeignKey(TemplateSelection, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.personal_info
+
+

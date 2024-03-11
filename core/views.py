@@ -26,6 +26,7 @@ from .serializers import (
     SkillSerializer,
     ProjectSerializer,
     ResumeTemplateSerializer,
+    ProfileSerializer
 )
 
 class RegisterView(APIView):
@@ -167,47 +168,56 @@ from rest_framework.authtoken.models import Token
 #         # return response
 
 
-class get_resume_template(APIView):
-    def get(self, request):
-        templates = ResumeTemplate.objects.all()
-        serializer = ResumeTemplateSerializer(templates, many=True)
-        return Response(serializer.data)
+# class get_resume_template(APIView):
+#     def get(self, request):
+#         templates = ResumeTemplate.objects.all()
+#         serializer = ResumeTemplateSerializer(templates, many=True)
+#         return Response(serializer.data)
 
-    def post(self, request):
-        try:
-            # Extract data from the request
-            user_id = request.data.get('user_id')
-            template_id = request.data.get('template_id')
+#     def post(self, request):
+#         try:
+#             # Extract data from the request
+#             user_id = request.data.get('user_id')
+#             template_id = request.data.get('template_id')
             
-            # Fetch user information based on the user ID
-            user_info = PersonalInformation.objects.get(user_id=user_id)
-            experience = Experience.objects.filter(user_id=user_id)
+#             # Fetch user information based on the user ID
+#             user_info = PersonalInformation.objects.get(user_id=user_id)
+#             experience = Experience.objects.filter(user_id=user_id)
             
-            # Fetch the selected template
-            template = Template.objects.get(id=template_id)
+#             # Fetch the selected template
+#             template = Template.objects.get(id=template_id)
             
-            # Serialize user information and experience
-            user_info_serializer = PersonalInformationSerializer(user_info)
-            experience_serializer = ExperienceSerializer(experience, many=True)
+#             # Serialize user information and experience
+#             user_info_serializer = PersonalInformationSerializer(user_info)
+#             experience_serializer = ExperienceSerializer(experience, many=True)
             
-            # Combine user information, experience, and template content
-            context = {
-                'user_info': user_info_serializer.data,
-                'experience': experience_serializer.data,
-                'template_content': template.html_content
-            }
+#             # Combine user information, experience, and template content
+#             context = {
+#                 'user_info': user_info_serializer.data,
+#                 'experience': experience_serializer.data,
+#                 'template_content': template.html_content
+#             }
             
-            # Generate PDF
-            pdf_file = generate_pdf(context)
+#             # Generate PDF
+#             pdf_file = generate_pdf(context)
             
-            # Return the PDF file
-            return Response({'pdf_file': pdf_file}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+#             # Return the PDF file
+#             return Response({'pdf_file': pdf_file}, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     
 
+class get_resume_template(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = ProfileSerializer
 
+    def post(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.selected_template = request.data.get('selected_template')
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 class CreateResumeAPIView(APIView):
     def post(self, request):
