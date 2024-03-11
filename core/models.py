@@ -78,6 +78,7 @@ class ProfessionalSummary(models.Model):
 class ResumeTemplate(models.Model):
     name = models.CharField(max_length=255)  
     content = models.TextField()  
+    image = models.ImageField(null=True, blank=True)
 
     def __str__(self):
         return self.name

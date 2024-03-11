@@ -1,4 +1,6 @@
+
 from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 import pdfkit
 import tempfile
@@ -14,7 +16,6 @@ from .serializers import RegisterSerializer, ProfileSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
-# from django.template.loader import render_to_string
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from .models import PersonalInformation, Education, ProfessionalExperience, Skill, Project, ResumeTemplate
@@ -160,6 +161,7 @@ from rest_framework.authtoken.models import Token
 #         return HttpResponse(html_content, content_type='text/html')
       
             
+
 #         # response = HttpResponse(pdf, content_type='application/pdf')
 #         # response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
 #         # return response
@@ -171,4 +173,84 @@ class get_resume_template(APIView):
         serializer = ResumeTemplateSerializer(templates, many=True)
         return Response(serializer.data)
 
+    def post(self, request):
+        try:
+            # Extract data from the request
+            user_id = request.data.get('user_id')
+            template_id = request.data.get('template_id')
+            
+            # Fetch user information based on the user ID
+            user_info = PersonalInformation.objects.get(user_id=user_id)
+            experience = Experience.objects.filter(user_id=user_id)
+            
+            # Fetch the selected template
+            template = Template.objects.get(id=template_id)
+            
+            # Serialize user information and experience
+            user_info_serializer = PersonalInformationSerializer(user_info)
+            experience_serializer = ExperienceSerializer(experience, many=True)
+            
+            # Combine user information, experience, and template content
+            context = {
+                'user_info': user_info_serializer.data,
+                'experience': experience_serializer.data,
+                'template_content': template.html_content
+            }
+            
+            # Generate PDF
+            pdf_file = generate_pdf(context)
+            
+            # Return the PDF file
+            return Response({'pdf_file': pdf_file}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
     
+
+
+
+class CreateResumeAPIView(APIView):
+    def post(self, request):
+        template_id = request.data.get('template_id')
+        try:
+            template = ResumeTemplate.objects.get(id=template_id)
+        except ResumeTemplate.DoesNotExist:
+            return Response({'error': 'Template not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        resume_data = create_resume_from_template(template)
+        return Response(resume_data)
+
+
+class GeneratePDFAPIView(APIView):
+    def post(self, request):
+        try:
+            # Extract data from the request
+            user_id = request.data.get('user_id')
+            template_id = request.data.get('template_id')
+            
+            # Fetch user information based on the user ID
+            user_info = PersonalInformation.objects.get(user_id=user_id)
+            experience = Experience.objects.filter(user_id=user_id)
+            
+            # Fetch the selected template
+            template = Template.objects.get(id=template_id)
+            
+            # Serialize user information and experience
+            user_info_serializer = PersonalInformationSerializer(user_info)
+            experience_serializer = ExperienceSerializer(experience, many=True)
+            
+            # Combine user information, experience, and template content
+            context = {
+                'user_info': user_info_serializer.data,
+                'experience': experience_serializer.data,
+                'template_content': template.html_content
+            }
+            
+            # Generate PDF
+            pdf_file = generate_pdf(context)
+            
+            # Return the PDF file
+            return Response({'pdf_file': pdf_file}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
