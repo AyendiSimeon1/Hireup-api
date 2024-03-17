@@ -18,7 +18,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from .models import PersonalInformation, Education, ProfessionalExperience, Skill, Project, ResumeTemplate
+from .models import PersonalInformation, Education, ProfessionalExperience, Skill, Project, ResumeTemplate, TemplateSelection
 from .serializers import (
     PersonalInformationSerializer,
     EducationSerializer,
@@ -26,7 +26,8 @@ from .serializers import (
     SkillSerializer,
     ProjectSerializer,
     ResumeTemplateSerializer,
-    ProfileSerializer
+    ProfileSerializer,
+    TemplateSelectionSerializer
 )
 
 class RegisterView(APIView):
@@ -109,63 +110,53 @@ from rest_framework.authtoken.models import Token
         # ... handle resume creation
 
 
-# class ResumeTemplateList(APIView):
-#     #permission_classes = [IsAuthenticated]
-#     def get(self, request):
-#         user_id = 1
-#         user = request.user
-#         user = User.objects.get(pk=user_id)
-#         information = PersonalInformation.objects.all()
-#         experiences = ProfessionalExperience.objects.all()
-#         skills = Skill.objects.filter(user=user)
-#         projects = Project.objects.filter(user=user)
+class ResumeTemplateList(APIView):
+    
+    # permission_classes = [IsAuthenticated]
 
-#         # data = request.data
-#         # template_id = data['templateId']
-#         template_id = 2
-#         # resume_data = data['resumeData']
-#         # Fetch the HTML template from the database
-#         skills_string = ', '.join([str(skill) for skill in skills])
-#         personal_string = ', '.join([str(personal) for personal in information])
+    def get(self, request):
+        user_id = request.user 
+        print(user_id)
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=404)
 
-       
+        information = PersonalInformation.objects.filter(user=user)  # Filter by user
+        experiences = ProfessionalExperience.objects.filter(user=user)  # Filter by user
+        skills = Skill.objects.filter(user=user)  # Filter by user
+        projects = Project.objects.filter(user=user)  # Filter by user
 
-#         # Replace the placeholder in the template
-        
-#         try:
-#             html_template = ResumeTemplate.objects.get(pk=template_id)
-#         except HtmlTemplate.DoesNotExist:
-#             return HttpResponse("Template not found", status=404)
-        
-      
-#         job_titles = ', '.join([experience.job_title for experience in experiences])
-#         responsibilities = ', '.join([experience.responsibilities for experience in experiences])
+        template_id = 1
+        if not template_id:
+            return Response({"error": "Missing template ID"}, status=400)
 
-#         #html_content = html_template.design.replace('{experiences}', experiences_html)
-#         html_content = html_template.content.format(
-#             user=user,
-#             information=personal_string,
-#             experiences=experiences, 
-#             skills=skills_string, 
-#             projects=projects, 
-#             job_titles=job_titles, 
-#             responsibilities=responsibilities
-#             )
+        try:
+            html_template = ResumeTemplate.objects.get(pk=template_id)
+        except ResumeTemplate.DoesNotExist:
+            return Response({"error": "Template not found"}, status=404)
 
-        
-#         path_wkhtmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'  
-#         config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+        skills_string = ', '.join([str(skill) for skill in skills])
 
-#         pdf = pdfkit.from_string(html_content, configuration=config)
+        # Consider using a templating engine instead of manual string formatting
+        html_content = html_template.content.format(
+            user=user,
+            information=information,  # Include personal information
+            experiences=experiences,  # Include experiences
+            skills=skills_string,
+            projects=projects,
+        )
 
-   
-#         return HttpResponse(html_content, content_type='text/html')
-      
-            
-
-#         # response = HttpResponse(pdf, content_type='application/pdf')
-#         # response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
-#         # return response
+        # PDF generation (assuming wkhtmltopdf is installed and configured)
+        try:
+            path_wkhtmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
+            config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+            pdf = pdfkit.from_string(html_content, configuration=config)
+            response = Response(pdf, content_type='application/pdf')
+            #response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
+            return response
+        except Exception as e:
+            print(f"Error generating PDF: {e}")  # Log the error for debugging
 
 
 # class get_resume_template(APIView):
@@ -206,29 +197,23 @@ from rest_framework.authtoken.models import Token
 #         except Exception as e:
 #             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    
-
-class get_resume_template(generics.RetrieveUpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = ProfileSerializer
-
-    def post(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.selected_template = request.data.get('selected_template')
-        instance.save()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
-class CreateResumeAPIView(APIView):
+class get_resume_template(APIView):
     def post(self, request):
-        template_id = request.data.get('template_id')
-        try:
-            template = ResumeTemplate.objects.get(id=template_id)
-        except ResumeTemplate.DoesNotExist:
-            return Response({'error': 'Template not found'}, status=status.HTTP_404_NOT_FOUND)
-        
-        resume_data = create_resume_from_template(template)
-        return Response(resume_data)
+        # Access the request data
+        data = JSONParser().parse(request)  # Optional for raw JSON handling
+        selected_template_id = data.get('template_name')
+
+        # Validate and create the template object
+        if selected_template_id:
+            template_obj, created = TemplateSelection.objects.get_or_create(
+                template_name=selected_template_id
+            )
+            response_data = {'message': 'Template selection successful'}
+        else:
+            response_data = {'message': 'Please provide a template name'}
+            return JsonResponse(response_data, status=400)  # Bad request
+
+        return JsonResponse(response_data, status=200)
 
 
 class GeneratePDFAPIView(APIView):

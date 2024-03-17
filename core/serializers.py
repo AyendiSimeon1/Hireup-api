@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
-from .models import PersonalInformation, Education, ProfessionalExperience, Skill, Project, ResumeTemplate
+from .models import PersonalInformation, Education, ProfessionalExperience, Skill, Project, ResumeTemplate, TemplateSelection
 
 
 User = get_user_model()
@@ -10,8 +10,12 @@ User = get_user_model()
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'selected_template']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
 
+class TemplateSelectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TemplateSelection
+        fields = '__all__'
 
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)

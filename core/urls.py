@@ -8,6 +8,7 @@ from .views import (
     SkillViewSet,
     ProjectViewSet,
     get_resume_template,
+    ResumeTemplateList
 )
 
 router = DefaultRouter()
@@ -24,6 +25,7 @@ urlpatterns= [
     path('login/', LoginView.as_view(), name='login'),
     path('profile/', Profile.as_view(), name='profile'),
     path('choose-resume-template/', get_resume_template.as_view(), name='get_resume_template'),
+    path('resume-templates/', ResumeTemplateList.as_view(), name='resume-template'),
     path('', include(router.urls)),
 
 ]
