@@ -13,7 +13,8 @@ SECRET_KEY = 'django-insecure-^2=lm_&vq!o)yi#*mjrr4*o%_$dr+3o6mrtze#x2_y%@v$$7pp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['hireup-api.onrender.com']
+
 
 
 # Application definition
