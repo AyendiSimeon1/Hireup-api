@@ -30,13 +30,6 @@ class ProfessionalExperience(models.Model):
     end_date = models.DateField(null=True, blank=True)
     work_summary = models.TextField(blank=True, null=True)
 
-    def __str__(self):
-        return f"{self.position_title} at {self.company}"
-
-
-
-
-
 class Education(models.Model):
     institution_name = models.CharField(max_length=255)
     degree = models.CharField(max_length=255)

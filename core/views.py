@@ -14,11 +14,14 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from .serializers import RegisterSerializer, ProfileSerializer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import JWTAuthentication
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from .models import PersonalInformation, Education, ProfessionalExperience, Skill, Project, ResumeTemplate, TemplateSelection
+from django.contrib.auth.models import User
+
 from .serializers import (
     PersonalInformationSerializer,
     EducationSerializer,
@@ -92,22 +95,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
-from rest_framework.authtoken.models import Token
 
-# def login_view(request):
-#     # ... your login logic
-#     token, created = Token.objects.get_or_create(user=user)
-#     return Response({'token': token.key})
-
-# from rest_framework.authentication import TokenAuthentication
-# from rest_framework.permissions import IsAuthenticated
-
-# class ResumeCreateView(APIView):
-#     authentication_classes = [TokenAuthentication]
-#     permission_classes = [IsAuthenticated]
-
-#     def post(self, request):
-        # ... handle resume creation
 
 
 class ResumeTemplateList(APIView):
@@ -216,36 +204,96 @@ class get_resume_template(APIView):
         return JsonResponse(response_data, status=200)
 
 
-class GeneratePDFAPIView(APIView):
-    def post(self, request):
-        try:
-            # Extract data from the request
-            user_id = request.data.get('user_id')
-            template_id = request.data.get('template_id')
+# class GeneratePDFAPIView(APIView):
+#     def get(self, request):
+#         try:
+#             # Extract data from the request
+#             user_id = request.data.get('user_id')
+#             template_id = request.data.get('template_id')
             
-            # Fetch user information based on the user ID
-            user_info = PersonalInformation.objects.get(user_id=user_id)
-            experience = Experience.objects.filter(user_id=user_id)
+#             # Fetch user information based on the user ID
+#             user_info = PersonalInformation.objects.get(user_id=user_id)
+#             experience = Experience.objects.filter(user_id=user_id)
+            
+#             # Fetch the selected template
+#             template = Template.objects.get(id=template_id)
+            
+#             # Serialize user information and experience
+#             user_info_serializer = PersonalInformationSerializer(user_info)
+#             experience_serializer = ExperienceSerializer(experience, many=True)
+            
+#             # Combine user information, experience, and template content
+#             context = {
+#                 'user_info': user_info_serializer.data,
+#                 'experience': experience_serializer.data,
+#                 'template_content': template.html_content
+#             }
+            
+#             # Generate PDF
+#             pdf_file = generate_pdf(context)
+            
+#             # Return the PDF file
+#             return Response({'pdf_file': pdf_file}, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class GeneratePDFAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            
+            
+            user = request.user
+            template_id = 1
+            
+            user_info = PersonalInformation.objects.get(user=user)
+            experiences = ProfessionalExperience.objects.filter(user_id=user)
+            educations = Education.objects.filter(user_id=user)
+            projects = Project.objects.filter(user_id=user)
+            socials = Socials.objects.get(user_id=user)
+            professional_summary = ProfessionalSummary.objects.get(user_id=user)
             
             # Fetch the selected template
-            template = Template.objects.get(id=template_id)
-            
-            # Serialize user information and experience
+            template = ResumeTemplate.objects.get(id=template_id)
+
             user_info_serializer = PersonalInformationSerializer(user_info)
-            experience_serializer = ExperienceSerializer(experience, many=True)
-            
-            # Combine user information, experience, and template content
+            experience_serializer = ProfessionalExperienceSerializer(experiences, many=True)
+            education_serializer = EducationSerializer(educations, many=True)
+            project_serializer = ProjectSerializer(projects, many=True)
+            socials_serializer = SocialsSerializer(socials)
+            professional_summary_serializer = ProfessionalSummarySerializer(professional_summary)
+  
             context = {
                 'user_info': user_info_serializer.data,
-                'experience': experience_serializer.data,
-                'template_content': template.html_content
+                'experiences': experience_serializer.data,
+                'educations': education_serializer.data,
+                'projects': project_serializer.data,
+                'socials': socials_serializer.data,
+                'professional_summary': professional_summary_serializer.data,
+                'template_content': template.content
             }
             
             # Generate PDF
-            pdf_file = generate_pdf(context)
+            pdf_file = self.generate_pdf(context, template)
             
             # Return the PDF file
             return Response({'pdf_file': pdf_file}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+    
+    def generate_pdf(self, context, template):
+        try:
+            template = get_template(template)
+            html = template.render(context)
+            
+            pdf_file_path = settings.MEDIA_ROOT + '/resume.pdf'
+            with open(pdf_file_path, 'w+b') as pdf_file:
+                pisa.CreatePDF(html, dest=pdf_file)
+                
+            return pdf_file_path
+        except Exception as e:
+            raise e
