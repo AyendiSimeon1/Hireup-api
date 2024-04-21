@@ -16,7 +16,7 @@ SECRET_KEY = 'django-insecure-^2=lm_&vq!o)yi#*mjrr4*o%_$dr+3o6mrtze#x2_y%@v$$7pp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['hireup-api.onrender.com']
+ALLOWED_HOSTS = ['hireup-api.onrender.com', 'localhost']
 
 env = environ.Env()
 env.read_env()
@@ -59,10 +59,10 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = 'admin1234'
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
@@ -79,6 +79,7 @@ SIMPLE_JWT = {
 
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    'AUTH_COOKIE_HTTP_ONLY': True,
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",

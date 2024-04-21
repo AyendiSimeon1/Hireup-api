@@ -14,7 +14,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from .serializers import RegisterSerializer, ProfileSerializer
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import JWTAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from reportlab.lib.pagesizes import letter
@@ -246,18 +246,28 @@ class GeneratePDFAPIView(APIView):
     def get(self, request):
         try:
             
-            
+        
+            access_token = request.headers.get("Authorization").split()[1] 
             user = request.user
+
+            if not user.is_authenticated:
+                raise HTTP_401_UNAUTHORIZED
             template_id = 1
             
-            user_info = PersonalInformation.objects.get(user=user)
-            experiences = ProfessionalExperience.objects.filter(user_id=user)
-            educations = Education.objects.filter(user_id=user)
-            projects = Project.objects.filter(user_id=user)
-            socials = Socials.objects.get(user_id=user)
-            professional_summary = ProfessionalSummary.objects.get(user_id=user)
-            
-            # Fetch the selected template
+            # user_info = PersonalInformation.objects.filter(user=user)
+            # experiences = ProfessionalExperience.objects.filter(user_id=user)
+            # educations = Education.objects.filter(user_id=user)
+            # projects = Project.objects.filter(user_id=user)
+            # socials = Socials.objects.filter(user_id=user)
+            # professional_summary = ProfessionalSummary.objects.filter(user_id=user)
+            user_info = user.personal_info.all()
+                             
+            experience  = user.ProfessionalExperience.all()
+            educations = user.Education.all()
+            socials = user.Socials.all()
+            professional_summary =  user.ProfessionalSummary.all()
+            projects = user.Project.all()
+           
             template = ResumeTemplate.objects.get(id=template_id)
 
             user_info_serializer = PersonalInformationSerializer(user_info)

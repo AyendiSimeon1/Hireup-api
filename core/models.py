@@ -84,7 +84,7 @@ class TemplateSelection(models.Model):
 
 
 class User(User): 
-    personal_info = models.OneToOneField(PersonalInformation, on_delete=models.CASCADE)
+    personal_info = models.OneToOneField(PersonalInformation, on_delete=models.CASCADE, related_name='user')
     skills = models.ManyToManyField(Skill, blank=True)
     professional_experiences = models.ManyToManyField(ProfessionalExperience, blank=True)
     educations = models.ManyToManyField(Education,  related_name="user_educations")
