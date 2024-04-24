@@ -7,7 +7,7 @@ from .views import (
     ProfessionalExperienceViewSet,
     SkillViewSet,
     ProjectViewSet,
-    get_resume_template,
+    
     ResumeTemplateList,
     GeneratePDFAPIView
 )
@@ -26,7 +26,6 @@ urlpatterns= [
     path('login/', LoginView.as_view(), name='login'),
     path('profile/', Profile.as_view(), name='profile'),
     path('choose-resume-template/', GeneratePDFAPIView.as_view(), name='get_resume_template'),
-    path('resume-templates/', get_resume_template.as_view(), name='get_resume_template'),
     path('', include(router.urls)),
 
 ]

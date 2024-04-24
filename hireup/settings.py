@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Custom Apss
+    
     'core',
     'allauth',
     'allauth.account',

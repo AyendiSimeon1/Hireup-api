@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractBaseUser, Group, Permission
 
 
 class PersonalInformation(models.Model):
@@ -83,17 +83,31 @@ class TemplateSelection(models.Model):
         return self.template_name
 
 
-class User(User): 
+class User(AbstractBaseUser): 
+    groups = models.ManyToManyField(
+        Group,
+        related_name="custom_user_set",  # Change this to a unique name
+        blank=True,
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name="custom_user_permissions_set",  # Change this to a unique name
+        blank=True,
+    )
+    id = models.AutoField(primary_key=True) 
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+
     personal_info = models.OneToOneField(PersonalInformation, on_delete=models.CASCADE, related_name='user')
-    skills = models.ManyToManyField(Skill, blank=True)
-    professional_experiences = models.ManyToManyField(ProfessionalExperience, blank=True)
-    educations = models.ManyToManyField(Education,  related_name="user_educations")
+    skills = models.ManyToManyField(Skill, blank=True, related_name='skills')
+    professional_experiences = models.ManyToManyField(ProfessionalExperience, blank=True, null=True)
+    educations = models.ManyToManyField(Education,  related_name="educations")
     projects = models.ManyToManyField(Project, related_name="user_projects")
     socials = models.ForeignKey(Socials, on_delete=models.CASCADE,related_name="user_socials")
     professional_summary = models.ForeignKey(ProfessionalSummary, on_delete=models.CASCADE, related_name="user_summary")
     selected_template = models.ForeignKey(TemplateSelection, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return self.personal_info
+        return f"{self.first_name} {self.last_name}" 
 
 
